@@ -44,12 +44,25 @@
       upgrade    = true;
     };
 
+    taps = [ "libracoder/kiri" ];
+
+    # Keep in sync with the cask list in ../Brewfile
     casks = [
-      "ghostty"
+      "aerospace"
+      "azookey"
       "betterdisplay"
-      "docker-desktop"
-      "vivaldi"
       "codex"
+      "discord"
+      "figma"
+      "ghostty"
+      "libracoder/kiri/kiri"
+      "linearmouse"
+      "neovide-app"
+      "notion"
+      "obs"
+      "spotify"
+      "stats"
+      "vivaldi"
       "font-lilex-nerd-font"
       "font-symbols-only-nerd-font"
     ];

@@ -34,8 +34,8 @@ flake.nix が読み込み → specialArgs で渡す
 
 ### darwin.nix (macOS のみ)
 
-- `homebrew.casks = [ ghostty vivaldi docker-desktop ... ]` — GUI アプリ
-  (Nix で扱えない macOS 特有のもの)
+- `homebrew.casks = [ ghostty vivaldi kiri ... ]` — GUI アプリ
+  (Nix で扱えない macOS 特有のもの。`../Brewfile` の cask と揃える)
 - `system.defaults.NSGlobalDomain.KeyRepeat = 2` などの macOS 設定
 - Touch ID sudo
 - `nix.enable = false` — Determinate installer との共存
@@ -43,28 +43,29 @@ flake.nix が読み込み → specialArgs で渡す
 
 ### home.nix (ユーザー層・両OS共通)
 
-- `home.packages` — CLI ツール群 (git / gh / tmux / fzf / ripgrep / bat /
-  eza / neovim / delta / lazygit / yazi + deps / mise / gum 等)
+- `home.packages` — mise で入らないものだけ (git / tmux / eza / gnupg /
+  yazi のプレビュー用ライブラリ / mise 本体 等)
 - `xdg.configFile."git/nix.inc"` — gitconfig の portable 部分だけ
   (personal は `~/.gitconfig.local` 経由)
-- `xdg.configFile."mise/conf.d/nix.toml"` — mise baseline runtimes
-  (node / python / go 等)
+- `home.activation.miseDotfiles` — dotfiles リポジトリを clone し、
+  `mise dot apply` で home/ を ~ にリンク
 - `home.activation.miseInstall` — rebuild 時に `mise install` 実行
+  (ツール一覧は home/.config/mise/config.toml)
 - `home.activation.cloneNvim` / `cloneTpm` — nvim config / tpm を git clone
   (宣言の手が届かない複雑設定は外出し)
 - `programs.git` / `programs.gh` — **無効化**
-  (perpet / 手動管理と衝突するため)
+  (mise dot が置くファイルと衝突するため)
 
 ## 基本方針
 
-- **パッケージ**: Nix に寄せる (`home.packages`)
-- **dotfiles 本体** (.zshrc / .tmux.conf / .gitconfig 等): perpet が担当
+- **CLI ツールとランタイム**: mise が担当。一覧は home/.config/mise/config.toml
+  の 1 か所だけで、どのセットアップ方法でも同じものが入る
+- **パッケージ**: mise で入らないもの (システムライブラリ等) だけ Nix
+- **dotfiles 本体** (.zshrc / .tmux.conf / .gitconfig 等): `mise dot` が担当
 - **衝突点** (.gitconfig / gh config): Nix はファイルを出さず、include 先
-  (`nix.inc`) や baseline (`mise conf.d`) だけ出す
+  (`nix.inc`) だけ出す
 - **非Nix的ツール** (nvim / tmux plugins): git clone のままにして、Nix は
   トリガだけ担当
-- **実ランタイム版** (node / python / ...): mise が管理、Nix は「最低
-  これは入れて」リストを渡すだけ
 
 ## レイヤ図
 
@@ -72,12 +73,12 @@ flake.nix が読み込み → specialArgs で渡す
 ┌─ macOS system ────────────────────────────┐
 │  nix-darwin (defaults + casks)            │  ← darwin.nix
 ├─ user profile ────────────────────────────┤
-│  home-manager (CLI tools + config files)  │  ← home.nix
-├─ runtime manager ─────────────────────────┤
-│  mise (node / python / ...)               │  ← conf.d/nix.toml +
-│                                           │    `mise install`
+│  home-manager (system libs + mise)        │  ← home.nix
+├─ tools ───────────────────────────────────┤
+│  mise (runtimes + CLI tools)              │  ← home/.config/mise/
+│                                           │    config.toml
 ├─ dotfiles ────────────────────────────────┤
-│  perpet (.zshrc, .gitconfig, etc.)        │  ← home/*
+│  mise dot (.zshrc, .gitconfig, etc.)      │  ← home/*
 ├─ plugins ─────────────────────────────────┤
 │  Lazy.nvim / tpm (git cloned)             │  ← home.activation hooks
 └───────────────────────────────────────────┘

@@ -10,26 +10,16 @@ in
   home.stateVersion = "24.11";
 
   # ---------------------------------------------------------------------
-  # Packages (equivalent to brew formulae in install-osx.sh)
+  # Packages: only what mise can't provide (system libs, tools without
+  # prebuilt binaries). CLI tools and runtimes come from mise, declared in
+  # home/.config/mise/config.toml, so every setup path shares one list.
   # ---------------------------------------------------------------------
   home.packages = with pkgs; [
-    # Core CLI
-    git ghq gh wget curl tmux zellij
-    fzf ripgrep bat eza neovim
-    delta lazygit
-    sqlite
-
-    # Linux VMs (runs Linux workloads on macOS; also works on Linux)
-    lima qemu
-
-    # yazi + dependencies
-    yazi ffmpeg p7zip jq poppler fd zoxide resvg imagemagick
-
-    # Runtime version manager (per-project / global runtimes)
+    git curl wget gnupg tmux eza sqlite
+    qemu
+    # yazi preview dependencies
+    ffmpeg p7zip poppler imagemagick
     mise
-
-    # Shell helper (gum) — used by the imperative scripts
-    gum
   ]
   ++ lib.optionals isDarwin [
     pinentry_mac
@@ -41,16 +31,15 @@ in
 
   # ---------------------------------------------------------------------
   # Programs — declarative shell/tool configs.
-  # NOTE: these generate files under ~/ and ~/.config/*. If perpet (or any
-  #       other tool) already manages the same target, home-manager will
-  #       refuse to overwrite it. Leave the corresponding block commented
-  #       until you retire perpet or remove the conflicting file.
+  # NOTE: these generate files under ~/ and ~/.config/*. Dotfiles are
+  #       symlinked by `mise dot apply` (see below), and home-manager refuses
+  #       to overwrite files it did not create, so keep these blocks off for
+  #       any target that lives in the repo's home/ directory.
   # ---------------------------------------------------------------------
   # Git (include-file pattern):
-  # perpet owns ~/.gitconfig and sources this file via `[include] path =
-  # ~/.config/git/nix.inc`. Portable, opinionated defaults live here;
-  # personal identity (name / email / signing key) stays in perpet so each
-  # machine can override. Settings in perpet's .gitconfig that appear AFTER
+  # The repo's ~/.gitconfig (linked by mise dot) sources this file via
+  # `[include] path = ~/.config/git/nix.inc`. Portable defaults live here;
+  # identity stays in the repo's .gitconfig. Settings in that file that appear AFTER
   # the include directive take precedence over anything here.
   xdg.configFile."git/nix.inc".text = ''
     [init]
@@ -77,35 +66,29 @@ in
   #   settings.git_protocol = "ssh";
   # };
 
-  # Shell integrations — keep disabled while perpet owns .zshrc / zeno_zsh etc.
+  # Shell integrations — keep disabled: .zshrc / .zeno_zsh come from the repo.
   # programs.fzf.enable = true;
   # programs.zoxide.enable = true;
   # programs.bat.enable = true;
 
   # ---------------------------------------------------------------------
-  # mise (Nix × mise hybrid)
+  # Dotfiles + tools through mise
   #
-  # - mise binary is provided through home.packages above.
-  # - conf.d/nix.toml declares the "baseline" global runtimes in Nix so
-  #   they travel with the flake. mise layers this with the imperative
-  #   ~/.config/mise/config.toml (written by `mise use -g <tool>@<ver>`),
-  #   and the latter takes precedence — so pins/overrides stay possible.
-  # - home.activation.miseInstall runs `mise install` after activation to
-  #   materialize anything missing.
+  # Same flow as install-osx.sh / install-linux.sh: clone the repo, point
+  # mise's global config at the repo copy, link home/ into ~ with
+  # `mise dot apply`, then install every tool the config declares.
   # ---------------------------------------------------------------------
-  xdg.configFile."mise/conf.d/nix.toml".text = ''
-    [tools]
-    node   = "latest"
-    python = "latest"
-    bun    = "latest"
-    pnpm   = "latest"
-    deno   = "latest"
-    go     = "latest"
-    rust   = "latest"
-    zig    = "latest"
+  home.activation.miseDotfiles = lib.hm.dag.entryAfter [ "installPackages" "writeBoundary" ] ''
+    repo="$HOME/ghq/github.com/NaruseNia/dotfiles"
+    if [ ! -d "$repo/.git" ]; then
+      $DRY_RUN_CMD ${pkgs.git}/bin/git clone https://github.com/NaruseNia/dotfiles.git "$repo"
+    fi
+    $DRY_RUN_CMD mkdir -p "$HOME/.config/mise"
+    $DRY_RUN_CMD ln -sfn "$repo/home/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
+    $DRY_RUN_CMD ${pkgs.mise}/bin/mise dot apply || true
   '';
 
-  home.activation.miseInstall = lib.hm.dag.entryAfter [ "installPackages" "writeBoundary" ] ''
+  home.activation.miseInstall = lib.hm.dag.entryAfter [ "miseDotfiles" ] ''
     $DRY_RUN_CMD ${pkgs.mise}/bin/mise install --yes || true
   '';
 
