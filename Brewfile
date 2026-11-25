@@ -49,7 +49,7 @@ brew "wimlib"
 # --- GUI apps -----------------------------------------------------------------
 cask "aerospace"
 cask "azookey"
-cask "betterdisplay"
+cask "betterdisplay", args: { adopt: true }  # installed by hand before
 cask "codex"
 cask "discord"
 cask "figma"
@@ -61,6 +61,6 @@ cask "notion"
 cask "obs"
 cask "spotify"
 cask "stats"
-cask "ardia"
+cask "ardia", args: { adopt: true }          # installed by hand before
 cask "font-lilex-nerd-font"
 cask "font-symbols-only-nerd-font"

@@ -39,16 +39,15 @@ ok()   { gum style --foreground "$C_OK"   "  ✓ $*"; }
 warn() { gum style --foreground "$C_WARN" "  ! $*"; }
 fail() { gum style --foreground "$C_ERR"  "  ✗ $*"; }
 
-spin() { gum spin --show-error --spinner minidot --title "  $1" -- "${@:2}"; }
-
-# live <title> <cmd…>: for long steps, stream the command's output (indented)
-# instead of hiding it behind a spinner, so progress and prompts stay visible.
+# live <title> <cmd…>: run the command attached to the terminal (no pipe),
+# so its own progress bars and prompts show up. A pipe would make tools like
+# brew think they are not on a terminal and go silent during long downloads.
 live() {
   local title="$1"; shift
   gum style --foreground "$C_SUB" "  › $title"
-  "$@" 2>&1 | while IFS= read -r line; do printf '    \033[38;5;%sm│\033[0m %s\n' "$C_DIM" "$line"; done
-  return "${PIPESTATUS[0]}"
+  "$@"
 }
+spin() { live "$@"; }   # every step streams; kept as a name for callers
 
 banner() {
   local title="$1" os="$2"
