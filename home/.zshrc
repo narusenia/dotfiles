@@ -115,18 +115,6 @@ function _fzf_cd_ghq() {
 zle -N _fzf_cd_ghq
 bindkey "^z" _fzf_cd_ghq
 
-function _fzf_cd_prj() {
-    FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS} --reverse --height=50%"
-    local root="${HOME}/projects"
-    local prj="$(ls ${root} | fzf)"
-    local dir="${root}/${prj}"
-    [ -n "${dir}" ] && cd "${dir}"
-    zle accept-line
-    zle reset-prompt
-}
-zle -N _fzf_cd_prj
-bindkey "^p" _fzf_cd_prj
-
 function mkcd() {
     if [ -z "$1" ]; then
         echo "Usage: mkcd <directory>"
@@ -135,10 +123,12 @@ function mkcd() {
     mkdir -p "$1" && cd "$1"
 }
 
+# mise first, so the checks below see mise-managed tools
+eval "$($HOME/.local/bin/mise activate zsh)"
+
 # Aliases
 if [[ $(command -v eza) ]]; then
   alias e='eza --icons --git'
-  alias l=e
   alias ls=e
   alias ea='eza -a --icons --git'
   alias la=ea
@@ -158,44 +148,34 @@ if [[ $(command -v tmux) ]]; then
 fi
 
 if command -v lazygit &> /dev/null; then
-  declare -x LG_CONFIG_FILE=~/.config/lazygit/config.yml
-  export LG_CONFIG_FILE
+  export LG_CONFIG_FILE=~/.config/lazygit/config.yml
 
   function lg(){
     lazygit "$@"
   }
 fi
 
-eval "$($HOME/.local/bin/mise activate zsh)"
-
 . "$HOME/.atuin/bin/env"
 
 eval "$(atuin init zsh)"
-
-alias nv="$HOME/bin/nvim-11/bin/nvim"
-alias acmd='act --container-architecture linux/amd64'
 
 # eval "$(zellij setup --generate-auto-start zsh)"
 
 export EDITOR='nvim'
 
-export PATH="/opt/homebrew/opt/sqlite/bin:$PATH"
-export PATH="$HOME/bin:$PATH"
+# PATH (typeset -U drops duplicates)
+typeset -U path
+path=(
+  $HOME/.local/bin
+  $HOME/bin
+  $HOME/.moon/bin
+  $HOME/.kimi-code/bin
+  $HOME/.opencode/bin
+  /opt/homebrew/opt/sqlite/bin
+  $path
+)
 
 source $HOME/.zeno_zsh
-
-# moonbit
-export PATH="$HOME/.moon/bin:$PATH"
-
-# kimi-code
-export PATH="$HOME/.kimi-code/bin:$PATH"
-
-
-# Added by Antigravity CLI installer
-export PATH="$HOME/.local/bin:$PATH"
-
-# opencode
-export PATH=$HOME/.opencode/bin:$PATH
 
 # Added by Kiri: its docker and kiri commands (kiri setup --uninstall removes this)
 case ":$PATH:" in *":$HOME/.kiri/bin:"*) ;; *) export PATH="$PATH:$HOME/.kiri/bin" ;; esac
