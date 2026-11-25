@@ -1,0 +1,61 @@
+[settings]
+# The only place the repo path is written; group roots are relative to it.
+dotfiles.root = "~/ghq/github.com/NaruseNia/dotfiles"
+
+# ---------------------------------------------------------------------------
+# Dotfiles: every file under home/ is symlinked to the same path under ~.
+# `mise dot add <file>` saves a new file into home/ as part of this group.
+# ---------------------------------------------------------------------------
+[dotfile_groups.home]
+root = "home"
+target = "~"
+mode = "symlink-each"
+exclude = [".DS_Store"]
+
+# ---------------------------------------------------------------------------
+# Tools
+# ---------------------------------------------------------------------------
+[tools]
+# runtimes
+bun = "latest"
+deno = "latest"
+go = "1.21"
+java = "latest"
+node = "24"
+pnpm = "latest"
+python = "latest"
+rust = "latest"
+yarn = "latest"
+zig = "0.16"
+
+# CLI (prebuilt binaries via aqua so they also work on Windows)
+"aqua:BurntSushi/ripgrep" = "latest"
+"aqua:ajeetdsouza/zoxide" = "latest"
+"aqua:charmbracelet/gum" = "latest"
+"aqua:cli/cli" = "latest"
+"aqua:dandavison/delta" = "latest"
+"aqua:itchyny/gojq" = "latest"
+"aqua:jesseduffield/lazydocker" = "latest"
+"aqua:jesseduffield/lazygit" = "latest"
+"aqua:jqlang/jq" = "latest"
+"aqua:junegunn/fzf" = "latest"
+"aqua:linebender/resvg" = "latest"
+"aqua:mozilla/sccache" = "latest"
+"aqua:muesli/duf" = "latest"
+"aqua:neovim/neovim" = "latest"
+"aqua:sharkdp/bat" = "latest"
+"aqua:sharkdp/fd" = "latest"
+"aqua:sxyazi/yazi" = "latest"
+"aqua:tldr-pages/tlrc" = "latest"
+"aqua:x-motemen/ghq" = "latest"
+"aqua:zellij-org/zellij" = { version = "latest", os = ["linux", "macos"] }
+"github:herdrdev/herdr" = { version = "latest", os = ["linux", "macos"] }
+"github:trasta298/keifu" = "latest"
+"github:yt-dlp/yt-dlp" = "latest"
+
+# cargo / npm
+"cargo:kache" = "2.3.0"
+"npm:@antfu/ni" = "latest"
+"npm:@marp-team/marp-cli" = "latest"
+"npm:@pen.dev/cli" = "latest"
+"npm:takt" = "latest"
