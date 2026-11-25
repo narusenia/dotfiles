@@ -1,133 +1,96 @@
 # dotfiles
 
-Dev environment configs for macOS and Linux. Three setup paths are available —
-pick whichever fits your taste.
+Dev environment for macOS, Linux and Windows, built on [mise](https://mise.jdx.dev):
 
-## Setup paths
+- **Dotfiles** — every file under `home/` is symlinked to the same path under `~`
+  by `mise dot apply`.
+- **CLI tools and runtimes** — one list in `home/.config/mise/config.toml`,
+  installed by `mise install`. Prebuilt binaries via the `aqua:` backend, so the
+  same list works on every OS.
+- **Everything else** — Homebrew (`Brewfile`), the Linux package manager, winget,
+  or Nix provides system libraries and GUI apps.
 
-| Path | OS | Package layer | Dotfile layer | Entry |
-|------|----|---------------|---------------|-------|
-| `install-osx.sh` | macOS | Homebrew | [perpet](https://github.com/NaruseNia/perpet) | `./install-osx.sh` |
-| `install-linux.sh` | Linux | system PM or Linuxbrew | perpet | `./install-linux.sh` |
-| `install-nix.sh` | macOS + Linux | Nix + home-manager (+ Homebrew casks on macOS) | home-manager (perpet optional) | `./install-nix.sh` |
+The mise config is itself one of the dotfiles, so the repo describes both the
+files and the tools.
 
-Each entry point is self-contained — you don't run them together.
+## Layout
 
-## Personal git identity (any path)
-
-`home/.gitconfig` intentionally contains **no** personal identity — the
-committed file only wires up includes. Drop your identity into
-`~/.gitconfig.local`, which is never touched by this repo:
-
-```ini
-[user]
-	name = Your Name
-	email = you@example.com
-	signingkey = XXXXXXXXXXXXXXXX
-[gpg]
-	program = gpg
-[commit]
-	gpgsign = true
-[tag]
-	gpgsign = true
+```
+home/                      → linked into ~ (mirror of $HOME)
+  .config/mise/config.toml   tools, [dotfile_groups], global tasks
+  .zshrc .zprofile .zshenv .gitconfig .tmux.conf …
+Brewfile                   macOS: system libs, tools without macOS binaries, casks
+scripts/lib.sh             UI + sections shared by the shell installers
+install-osx.sh             macOS installer
+install-linux.sh           Linux installer (apt / dnf / pacman / zypper, or -b for Linuxbrew)
+install-windows.ps1        Windows installer (winget) — untested
+install-nix.sh, nix/       Nix alternative (nix-darwin / home-manager)
 ```
 
-Git silently skips missing includes, so a machine without this file still
-works — git just won't know who you are until you create it.
+The repo lives at `~/ghq/github.com/NaruseNia/dotfiles`. That path is written
+once, as `dotfiles.root` in the mise config.
 
-## 1. Shell-script + Homebrew (macOS)
+## Setup
 
 ```sh
-./install-osx.sh            # interactive section selection
-./install-osx.sh -a         # run all sections non-interactively
-./install-osx.sh cli casks  # run only the specified sections
-./install-osx.sh -h         # list sections
+git clone https://github.com/NaruseNia/dotfiles.git ~/ghq/github.com/NaruseNia/dotfiles
+cd ~/ghq/github.com/NaruseNia/dotfiles
+
+./install-osx.sh          # macOS: pick sections interactively
+./install-osx.sh -a       # macOS: everything
+./install-linux.sh -a     # Linux (add -b for Linuxbrew)
+./install-nix.sh          # Nix path (see nix/ARCHITECTURE.md)
 ```
 
-The script bootstraps Xcode Command Line Tools, Homebrew, and `gum`, then
-installs CLI tools, GUI apps (casks), language runtimes via `mise`, AI tools
-(codex, claude, crmux), and applies dotfiles through perpet. It also generates
-an SSH key, authenticates `gh`, uploads the key to GitHub, and sets sensible
-macOS defaults.
+```powershell
+# Windows (PowerShell)
+git clone https://github.com/NaruseNia/dotfiles.git $HOME\ghq\github.com\NaruseNia\dotfiles
+cd $HOME\ghq\github.com\NaruseNia\dotfiles
+.\install-windows.ps1
+```
 
-## 2. Shell-script + system PM / Linuxbrew (Linux)
+Each installer bootstraps mise first and runs in sections, so any part can be
+rerun alone, e.g. `./install-osx.sh dotfiles tools`. Existing real files that
+would be replaced by a link are moved to `~/.dotfiles-backup/<timestamp>/`.
+
+On Windows, `mise dot apply` copies files instead of linking them unless
+Developer Mode is on. Copies don't follow the repo, so rerun
+`mise run dot:sync` after pulling.
+
+### Doing it by hand
 
 ```sh
-./install-linux.sh            # system package manager (apt/dnf/pacman/zypper)
-./install-linux.sh -a -b      # Linuxbrew mode (Homebrew on Linux)
-./install-linux.sh cli apps   # specific sections only
-./install-linux.sh -h         # list sections
+curl https://mise.run | sh
+mkdir -p ~/.config/mise
+ln -s ~/ghq/github.com/NaruseNia/dotfiles/home/.config/mise/config.toml ~/.config/mise/config.toml
+mise dot apply
+mise install
 ```
 
-The script auto-detects `apt`, `dnf`, `pacman`, or `zypper`. With `-b` /
-`--brew` it bootstraps Linuxbrew and uses Homebrew for CLI tools — giving you
-the same package names as macOS. It also installs Nerd Fonts from GitHub
-releases, fixes Ubuntu's `batcat`/`fdfind` binary names via symlinks, and falls
-back to GitHub release binaries for `eza`, `lazygit`, and `git-delta` when they
-aren't in the default repositories.
+## Day-to-day
 
-## 3. Nix (macOS + Linux)
+Files in `~` are symlinks into the repo, so editing `~/.zshrc` edits the repo.
+The global tasks below run from any directory (`mise tasks` lists them):
 
-Declarative alternative to paths 1 and 2. Manages packages, shell programs,
-macOS defaults, and Homebrew casks from a single `flake.nix`.
+| Task | What it does |
+|------|--------------|
+| `mise run dot:status` | uncommitted changes + link status |
+| `mise run dot:save "message"` | commit everything and push |
+| `mise run dot:sync` | pull, relink, install newly added tools |
+| `mise run dot:add <path>` | move a file into `home/` and link it back |
+| `mise run dot:edit` | open the repo in `$EDITOR` |
+| `mise run brew:check` | brew packages installed but missing from `Brewfile` |
+| `mise run tools:up` | upgrade mise tools, drop unused versions |
+| `mise run clean` | free disk space (brew, mise, npm, pnpm, uv caches) |
 
-```sh
-./install-nix.sh
-```
+Adding a tool: `mise use -g aqua:owner/repo` writes it into the repo's config.
+Prefer `aqua:` over the registry default, which may compile from source
+(`cargo:`) or use an asdf plugin that doesn't work on Windows.
 
-On macOS this runs `nix-darwin` + `home-manager` + `nix-homebrew`. On Linux it
-runs standalone `home-manager` (system packages / GUI apps still come from your
-distro).
+## Git identity
 
-### First-time setup
-
-```sh
-cp nix/user.example.nix nix/user.nix
-# edit nix/user.nix — set username, fullName, email, hostname, system
-./install-nix.sh
-```
-
-`nix/user.nix` is gitignored so your personal info never leaves your machine.
-
-### Rebuilding later
-
-```sh
-# macOS
-sudo darwin-rebuild switch --flake path:$HOME/.perpet/nix#<hostname>
-
-# Linux
-home-manager switch --flake path:$HOME/.perpet/nix#<username>@linux
-```
-
-The `path:` URL scheme is required because `nix/user.nix` is gitignored —
-without it the flake evaluator would not see the file.
-
-### Layout
-
-```
-nix/
-├── flake.nix         # inputs/outputs, reads user.nix
-├── user.example.nix  # template (committed)
-├── user.nix          # your values (gitignored — create this)
-├── home.nix          # home-manager: CLI packages, git, gh, nvim/tpm clones
-└── darwin.nix        # nix-darwin: casks, macOS defaults, Touch ID sudo
-```
-
-### perpet compatibility
-
-`nix/home.nix` keeps `programs.*` minimal (only `programs.git` and
-`programs.gh`, which manage global config that doesn't overlap with typical
-perpet-managed dotfiles). Richer modules like `programs.fzf` / `programs.bat`
-are left commented out — enable them only when you retire perpet or verify
-there's no conflict.
-
-## Legacy / dotfiles-only
-
-If you just want the dotfiles without the installer scripts, perpet alone still
-works:
-
-```sh
-curl -fsSL https://raw.githubusercontent.com/NaruseNia/perpet/main/scripts/install.sh | sh
-perpet init https://github.com/NaruseNia/dotfiles.git
-perpet apply --force
-```
+`home/.gitconfig` holds the shared settings and identity. Extra
+machine-specific settings go in `~/.gitconfig.local`, which the committed file
+includes and this repo never touches. It is included before `[user]`, so the
+committed identity wins for keys set in both. Never run `git config --global` here: `~/.gitconfig`
+is a link into the repo, so it would edit the committed file.
