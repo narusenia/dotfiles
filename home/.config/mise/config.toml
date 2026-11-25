@@ -50,6 +50,7 @@ zig = "0.16"
 "aqua:x-motemen/ghq" = "latest"
 "aqua:zellij-org/zellij" = { version = "latest", os = ["linux", "macos"] }
 "github:herdrdev/herdr" = { version = "latest", os = ["linux", "macos"] }
+"github:padovanl/portop" = { version = "latest", os = ["linux", "macos"] }
 "github:trasta298/keifu" = "latest"
 "github:yt-dlp/yt-dlp" = "latest"
 
