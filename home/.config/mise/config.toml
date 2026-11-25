@@ -59,3 +59,73 @@ zig = "0.16"
 "npm:@marp-team/marp-cli" = "latest"
 "npm:@pen.dev/cli" = "latest"
 "npm:takt" = "latest"
+
+# ---------------------------------------------------------------------------
+# Global tasks: `mise run <name>` from any directory (`mise tasks` lists them)
+# The repo path is read from dotfiles.root, so it is written only once above.
+# ---------------------------------------------------------------------------
+[tasks."dot:status"]
+description = "Show uncommitted dotfile changes and link status"
+run = '''
+D=$(mise settings get dotfiles.root); D="${D/#\~/$HOME}"
+git -C "$D" status --short --branch
+mise dot status
+'''
+
+[tasks."dot:sync"]
+description = "Pull the dotfiles repo, relink, and install new tools"
+run = '''
+D=$(mise settings get dotfiles.root); D="${D/#\~/$HOME}"
+git -C "$D" pull --rebase --autostash
+mise dot apply
+mise install --yes
+'''
+
+[tasks."dot:save"]
+description = "Commit every dotfile change and push (usage: mise run dot:save 'message')"
+usage = 'arg "<message>" help="commit message"'
+run = '''
+D=$(mise settings get dotfiles.root); D="${D/#\~/$HOME}"
+git -C "$D" add -A
+git -C "$D" commit -m "$usage_message"
+git -C "$D" push
+'''
+
+[tasks."dot:add"]
+description = "Start managing a file (usage: mise run dot:add ~/.config/foo/bar.toml)"
+usage = 'arg "<path>" help="file under ~ to move into the repo"'
+run = 'mise dot add "$usage_path"'
+
+[tasks."dot:edit"]
+description = "Open the dotfiles repo in $EDITOR"
+run = '''
+D=$(mise settings get dotfiles.root); D="${D/#\~/$HOME}"
+cd "$D" && ${EDITOR:-nvim} .
+'''
+
+[tasks."brew:check"]
+description = "Show brew packages installed but missing from the Brewfile"
+run = '''
+D=$(mise settings get dotfiles.root); D="${D/#\~/$HOME}"
+brew bundle cleanup --file "$D/Brewfile" || true  # exits 1 when it finds extras
+'''
+
+[tasks."tools:up"]
+description = "Upgrade mise tools and drop versions no config uses"
+run = '''
+mise upgrade
+mise prune --yes
+'''
+
+[tasks.clean]
+description = "Free disk space: old brew/mise versions and package caches"
+run = '''
+df -h / | tail -1
+command -v brew >/dev/null && brew cleanup -s
+mise prune --yes
+mise cache clear
+command -v npm  >/dev/null && npm cache clean --force
+command -v pnpm >/dev/null && pnpm store prune
+command -v uv   >/dev/null && uv cache clean
+df -h / | tail -1
+'''
