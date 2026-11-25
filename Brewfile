@@ -26,23 +26,13 @@ brew "pkgconf"
 brew "autoconf-archive"
 brew "automake"
 
-# --- yazi previews / media ----------------------------------------------------
+# --- Media (ffmpeg is used by yt-dlp) -----------------------------------------
 brew "ffmpeg-full"
-brew "imagemagick-full"
-brew "poppler"
-brew "sevenzip"
-brew "chafa"
 
 # --- Misc ---------------------------------------------------------------------
-brew "cava"
-brew "fontforge"
-brew "forgejo-cli"
 brew "mole"
 brew "open-image-denoise"
-brew "pgcli"
-brew "postgresql@18"
 brew "qemu"
-brew "scrcpy"
 brew "spotify_player"
 brew "wimlib"
 

@@ -117,7 +117,7 @@ summary() {
   {
     echo "tool,version"
     local t v
-    for t in mise git gh nvim tmux zellij node python go rustc zig yazi claude codex agy; do
+    for t in mise git gh nvim tmux zellij node python go rustc zig claude codex agy; do
       command -v "$t" &>/dev/null || continue
       case "$t" in
         tmux)   v=$(tmux -V 2>/dev/null) ;;

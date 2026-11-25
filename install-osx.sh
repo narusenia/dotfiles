@@ -46,7 +46,7 @@ run_brew() {
   sudo -v || true
   live "brew bundle (CLI libs + apps)" brew bundle --file "$DOTFILES_DIR/Brewfile" \
     && ok "Brewfile applied" || warn "some Brewfile entries failed — rerun: brew bundle --file $DOTFILES_DIR/Brewfile"
-  brew link ffmpeg-full imagemagick-full -f --overwrite &>/dev/null || true
+  brew link ffmpeg-full -f --overwrite &>/dev/null || true
 }
 
 install_codex() {

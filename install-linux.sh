@@ -264,7 +264,7 @@ run_pkgs() {
   local pkgs=(
     git curl wget tmux eza gcc sqlite unzip
     xclip wl-clipboard qemu
-    ffmpeg-full sevenzip poppler imagemagick-full
+    ffmpeg-full
   )
   for p in "${pkgs[@]}"; do pkg_install "$p"; done
 }

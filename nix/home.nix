@@ -17,8 +17,7 @@ in
   home.packages = with pkgs; [
     git curl wget gnupg tmux eza sqlite
     qemu
-    # yazi preview dependencies
-    ffmpeg p7zip poppler imagemagick
+    ffmpeg   # yt-dlp merges formats with it
     mise
   ]
   ++ lib.optionals isDarwin [

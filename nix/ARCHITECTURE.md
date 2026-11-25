@@ -44,7 +44,7 @@ flake.nix が読み込み → specialArgs で渡す
 ### home.nix (ユーザー層・両OS共通)
 
 - `home.packages` — mise で入らないものだけ (git / tmux / eza / gnupg /
-  yazi のプレビュー用ライブラリ / mise 本体 等)
+  yt-dlp 用の ffmpeg / mise 本体 等)
 - `xdg.configFile."git/nix.inc"` — gitconfig の portable 部分だけ
   (personal は `~/.gitconfig.local` 経由)
 - `home.activation.miseDotfiles` — dotfiles リポジトリを clone し、
