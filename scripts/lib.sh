@@ -41,6 +41,15 @@ fail() { gum style --foreground "$C_ERR"  "  ✗ $*"; }
 
 spin() { gum spin --show-error --spinner minidot --title "  $1" -- "${@:2}"; }
 
+# live <title> <cmd…>: for long steps, stream the command's output (indented)
+# instead of hiding it behind a spinner, so progress and prompts stay visible.
+live() {
+  local title="$1"; shift
+  gum style --foreground "$C_SUB" "  › $title"
+  "$@" 2>&1 | while IFS= read -r line; do printf '    \033[38;5;%sm│\033[0m %s\n' "$C_DIM" "$line"; done
+  return "${PIPESTATUS[0]}"
+}
+
 banner() {
   local title="$1" os="$2"
   echo
@@ -164,7 +173,7 @@ run_dotfiles() {
 }
 
 run_tools() {
-  spin "mise install (runtimes + CLI tools)…" mise install --yes && ok "all mise tools installed"
+  live "mise install (runtimes + CLI tools)" mise install --yes && ok "all mise tools installed"
 }
 
 run_ai() {

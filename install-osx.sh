@@ -41,7 +41,10 @@ ensure_mise
 # ---------------------------------------------------------------------------
 run_brew() {
   spin "brew update…" brew update
-  spin "brew bundle (CLI libs + apps)…" brew bundle --file "$DOTFILES_DIR/Brewfile" \
+  # some casks ask for an admin password mid-install; ask once up front
+  info "admin password may be needed for some apps"
+  sudo -v || true
+  live "brew bundle (CLI libs + apps)" brew bundle --file "$DOTFILES_DIR/Brewfile" \
     && ok "Brewfile applied" || warn "some Brewfile entries failed — rerun: brew bundle --file $DOTFILES_DIR/Brewfile"
   brew link ffmpeg-full imagemagick-full -f --overwrite &>/dev/null || true
 }
