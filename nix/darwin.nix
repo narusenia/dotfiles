@@ -62,7 +62,7 @@
       "obs"
       "spotify"
       "stats"
-      "vivaldi"
+      "ardia"
       "font-lilex-nerd-font"
       "font-symbols-only-nerd-font"
     ];
