@@ -24,5 +24,10 @@
 [user]
 	name = Naruse Nia
 	email = notshinsin0000@gmail.com
+	signingkey = 66385F6E217023DB
 [init]
 	defaultBranch = main
+[commit]
+	gpgsign = true
+[core]
+	autocrlf = input
