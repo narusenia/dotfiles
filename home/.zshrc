@@ -184,3 +184,18 @@ export PATH="$HOME/bin:$PATH"
 
 source $HOME/.zeno_zsh
 
+# moonbit
+export PATH="$HOME/.moon/bin:$PATH"
+
+# kimi-code
+export PATH="$HOME/.kimi-code/bin:$PATH"
+
+
+# Added by Antigravity CLI installer
+export PATH="$HOME/.local/bin:$PATH"
+
+# opencode
+export PATH=$HOME/.opencode/bin:$PATH
+
+# Added by Kiri: its docker and kiri commands (kiri setup --uninstall removes this)
+case ":$PATH:" in *":$HOME/.kiri/bin:"*) ;; *) export PATH="$PATH:$HOME/.kiri/bin" ;; esac
