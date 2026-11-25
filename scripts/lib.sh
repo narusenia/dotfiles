@@ -173,6 +173,35 @@ run_ai() {
   install_codex
 }
 
+# Terminal fonts (ghostty: Ioskeley Mono Term + Obel Mono italic)
+FONT_DIR="$HOME/Library/Fonts"
+[[ "$(uname -s)" == Linux ]] && FONT_DIR="$HOME/.local/share/fonts"
+
+# install_font <label> <file-glob already installed> <zip url> <path pattern inside zip>
+install_font() {
+  local label="$1" check="$2" url="$3" pattern="$4" tmp
+  if compgen -G "$FONT_DIR/$check" >/dev/null; then info "$label (already installed)"; return 0; fi
+  tmp=$(mktemp -d)
+  if spin "Downloading $label…" curl -fsSL -o "$tmp/font.zip" "$url"; then
+    unzip -qo "$tmp/font.zip" -d "$tmp/x"
+    mkdir -p "$FONT_DIR"
+    find "$tmp/x" -path "$pattern" -name '*.ttf' -exec cp {} "$FONT_DIR/" \;
+    ok "$label installed"
+  else
+    fail "$label download failed"
+  fi
+  rm -rf "$tmp"
+}
+
+run_fonts() {
+  install_font "Ioskeley Mono Term" "IoskeleyMonoTerm-*.ttf" \
+    https://github.com/ahatem/IoskeleyMono/releases/latest/download/IoskeleyMono-Term.zip "*/Normal/Hinted/*"
+  # shortcut: Obel Mono has no "latest" URL, pinned to 1.004; bump when a new version ships
+  install_font "Obel Mono" "ObelMono-*.ttf" \
+    https://typographic.systems/download/ObelMono-1.004-ttf.zip "*/static/*"
+  if command -v fc-cache &>/dev/null; then fc-cache -f "$FONT_DIR" >/dev/null 2>&1 || true; fi
+}
+
 run_nvim() {
   local dir="$HOME/.config/nvim"
   if [[ -d "$dir" ]]; then

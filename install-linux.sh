@@ -421,7 +421,7 @@ run_defaults() {
 # ---------------------------------------------------------------------------
 # Sections
 # ---------------------------------------------------------------------------
-SECTIONS=(mise dotfiles pkgs tools apps ai identity nvim tmux zellij defaults)
+SECTIONS=(mise dotfiles pkgs tools apps fonts ai identity nvim tmux zellij defaults)
 
 section_title() {
   case "$1" in
@@ -430,6 +430,7 @@ section_title() {
     pkgs)     echo "System packages ($PM$([[ $USE_BREW == 1 ]] && echo ' + brew'))" ;;
     tools)    echo "Runtimes & CLI tools (mise)" ;;
     apps)     echo "GUI apps · kiri · fonts" ;;
+    fonts)    echo "Terminal fonts: Ioskeley Mono · Obel Mono" ;;
     ai)       echo "AI tools: claude · codex · agy" ;;
     identity) echo "SSH key · gh auth" ;;
     nvim)     echo "Neovim config" ;;

@@ -95,7 +95,7 @@ run_defaults() {
 # ---------------------------------------------------------------------------
 # Sections
 # ---------------------------------------------------------------------------
-SECTIONS=(mise dotfiles brew tools ai identity nvim tmux zellij defaults)
+SECTIONS=(mise dotfiles brew tools fonts ai identity nvim tmux zellij defaults)
 
 section_title() {
   case "$1" in
@@ -103,6 +103,7 @@ section_title() {
     dotfiles) echo "Dotfiles (mise dot)" ;;
     brew)     echo "Homebrew bundle" ;;
     tools)    echo "Runtimes & CLI tools (mise)" ;;
+    fonts)    echo "Terminal fonts: Ioskeley Mono · Obel Mono" ;;
     ai)       echo "AI tools: claude · codex · agy" ;;
     identity) echo "SSH key · gh auth" ;;
     nvim)     echo "Neovim config" ;;
