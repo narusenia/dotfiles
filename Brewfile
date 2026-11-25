@@ -1,48 +1,66 @@
 # ==========================================================================
-# Brewfile — declarative source of truth for Homebrew dependencies
-# Usage: brew bundle [--file=Brewfile]
+# Brewfile — what mise can't provide: system libraries, build tools,
+# tools without prebuilt macOS binaries, and GUI apps.
+# CLI tools with prebuilt binaries live in home/.config/mise/config.toml.
+# Usage: brew bundle --file Brewfile
 # ==========================================================================
 
-# --- CLI tools ------------------------------------------------------------
+tap "libracoder/kiri"
+
+# --- Core ---------------------------------------------------------------------
 brew "git"
-brew "ghq"
-brew "gcc"
-brew "gh"
-brew "wget"
 brew "curl"
-brew "tmux"
-brew "zellij"
-brew "fzf"
-brew "ripgrep"
-brew "bat"
-brew "eza"
-brew "neovim"
-brew "git-delta"
-brew "lazygit"
+brew "wget"
+brew "gnupg"
 brew "pinentry-mac"
+brew "tmux"
+brew "eza"            # no prebuilt macOS binary upstream
+brew "trash"
 brew "sqlite"
-brew "lima"
-brew "qemu"
 
-# --- yazi + deps ----------------------------------------------------------
-brew "yazi"
-brew "ffmpeg"
-brew "sevenzip"
-brew "jq"
+# --- Build toolchain ----------------------------------------------------------
+brew "gcc"
+brew "cmake"
+brew "ninja"
+brew "pkgconf"
+brew "autoconf-archive"
+brew "automake"
+
+# --- yazi previews / media ----------------------------------------------------
+brew "ffmpeg-full"
+brew "imagemagick-full"
 brew "poppler"
-brew "fd"
-brew "zoxide"
-brew "resvg"
-brew "imagemagick"
+brew "sevenzip"
+brew "chafa"
 
-# --- Shell helper ---------------------------------------------------------
-brew "gum"
+# --- Misc ---------------------------------------------------------------------
+brew "cava"
+brew "fontforge"
+brew "forgejo-cli"
+brew "mole"
+brew "open-image-denoise"
+brew "pgcli"
+brew "postgresql@18"
+brew "qemu"
+brew "scrcpy"
+brew "spotify_player"
+brew "wimlib"
 
-# --- GUI apps (casks) -----------------------------------------------------
-cask "ghostty"
+# --- GUI apps -----------------------------------------------------------------
+cask "aerospace"
+cask "azookey"
 cask "betterdisplay"
-cask "docker-desktop"
-cask "vivaldi"
 cask "codex"
+cask "discord"
+cask "figma"
+cask "ghostty"
+cask "kiri"
+cask "linearmouse"
+cask "neovide-app"
+cask "notion"
+cask "obs"
+cask "spotify"
+cask "stats"
+cask "vivaldi"
 cask "font-lilex-nerd-font"
 cask "font-symbols-only-nerd-font"
