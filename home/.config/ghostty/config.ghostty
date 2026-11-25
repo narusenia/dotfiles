@@ -8,7 +8,6 @@ theme=Aizen Dark
 theme=Cutie Pro
 
 font-family=Ioskeley Mono Term
-# shortcut: family name unverified (font not installed on this mac); check with `ghostty +list-fonts`
 font-family-italic=Obel Mono
 # font-family=Berkeley Mono
 # font-family=DMMono Nerd Font Mono
