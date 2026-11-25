@@ -78,7 +78,7 @@ description = "Pull the dotfiles repo, relink, and install new tools"
 run = '''
 D=$(mise settings get dotfiles.root); D="${D/#\~/$HOME}"
 git -C "$D" pull --rebase --autostash
-mise dot apply
+mise dot apply --yes
 mise install --yes
 '''
 

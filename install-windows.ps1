@@ -86,7 +86,7 @@ function Run-Dotfiles {
   Remove-Item $cfg -Force -ErrorAction SilentlyContinue
   try   { New-Item -ItemType SymbolicLink -Path $cfg -Target $src | Out-Null; Ok 'mise config linked' }
   catch { Copy-Item $src $cfg; Warn 'Developer Mode off: mise config copied, not linked' }
-  mise dot apply --force
+  mise dot apply --force --yes
   if ($LASTEXITCODE -eq 0) { Ok 'dotfiles applied (copies unless Developer Mode is on)' } else { Fail 'mise dot apply failed' }
 }
 

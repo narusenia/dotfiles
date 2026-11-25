@@ -85,7 +85,7 @@ in
     fi
     $DRY_RUN_CMD mkdir -p "$HOME/.config/mise"
     $DRY_RUN_CMD ln -sfn "$repo/home/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
-    $DRY_RUN_CMD ${pkgs.mise}/bin/mise dot apply || true
+    $DRY_RUN_CMD ${pkgs.mise}/bin/mise dot apply --yes || true
   '';
 
   home.activation.miseInstall = lib.hm.dag.entryAfter [ "miseDotfiles" ] ''

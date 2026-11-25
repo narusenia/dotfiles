@@ -160,7 +160,7 @@ run_dotfiles() {
   # mise reads [dotfiles] from its global config, which itself lives in the repo
   mkdir -p "$HOME/.config/mise"
   ln -sfn "$DOTFILES_DIR/home/.config/mise/config.toml" "$HOME/.config/mise/config.toml"
-  spin "mise dot apply…" mise dot apply --force && ok "dotfiles linked"
+  spin "mise dot apply…" mise dot apply --force --yes && ok "dotfiles linked"
 }
 
 run_tools() {
